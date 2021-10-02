@@ -2,6 +2,7 @@ package com.epam.izh.rd.online.repository;
 
 public class SimpleFileRepository implements FileRepository {
 
+
     /**
      * Метод рекурсивно подсчитывает количество файлов в директории
      *
@@ -12,6 +13,9 @@ public class SimpleFileRepository implements FileRepository {
     public long countFilesInDirectory(String path) {
         return 0;
     }
+
+
+
 
     /**
      * Метод рекурсивно подсчитывает количество папок в директории, считая корень

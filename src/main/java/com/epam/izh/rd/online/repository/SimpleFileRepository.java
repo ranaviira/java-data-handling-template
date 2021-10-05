@@ -1,5 +1,13 @@
 package com.epam.izh.rd.online.repository;
 
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class SimpleFileRepository implements FileRepository {
 
 
@@ -11,10 +19,10 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public long countFilesInDirectory(String path) {
-        return 0;
+
+
+        return countFilesInDirectory(path);
     }
-
-
 
 
     /**
@@ -36,8 +44,11 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public void copyTXTFiles(String from, String to) {
+        copyTXTFiles(from, to);
+
         return;
     }
+
 
     /**
      * Метод создает файл на диске с расширением txt
@@ -48,8 +59,26 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public boolean createFile(String path, String name) {
-        return false;
+
+        Path path1 = Paths.get(path + "/" + name);
+        Path path2 = Paths.get(path);
+        try {
+            if (!Files.exists(path2)) {
+                Files.createDirectory(path2);
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        try {
+            if (!Files.exists(path1)) {
+                Files.createFile(path1);
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return Files.exists(path1);
     }
+
 
     /**
      * Метод считывает тело файла .txt из папки src/main/resources
@@ -59,6 +88,11 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public String readFileFromResources(String fileName) {
-        return null;
+        try {
+            FileReader fileReader = new FileReader(readFileFromResources(fileName));
+            return fileReader.getEncoding();
+        } catch (FileNotFoundException e) {
+            return null;
+        }
     }
 }

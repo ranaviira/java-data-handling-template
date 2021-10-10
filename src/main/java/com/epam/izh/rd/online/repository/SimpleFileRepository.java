@@ -1,16 +1,10 @@
 package com.epam.izh.rd.online.repository;
 
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 
 public class SimpleFileRepository implements FileRepository {
-
-
     /**
      * Метод рекурсивно подсчитывает количество файлов в директории
      *
@@ -19,11 +13,21 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public long countFilesInDirectory(String path) {
-
-
-        return countFilesInDirectory(path);
+        long count = 0;
+        File directory = new File("src/main/resources/" + path);
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    count++;
+                }
+                if (file.isDirectory()) {
+                    count += countFilesInDirectory(path + "/" + file.getName());
+                }
+            }
+        }
+        return count;
     }
-
 
     /**
      * Метод рекурсивно подсчитывает количество папок в директории, считая корень
@@ -33,7 +37,17 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public long countDirsInDirectory(String path) {
-        return 0;
+        long count = 1;
+        File directory = new File("src/main/resources/" + path);
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    count += countDirsInDirectory(path + "/" + file.getName());
+                }
+            }
+        }
+        return count;
     }
 
     /**
@@ -44,9 +58,35 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public void copyTXTFiles(String from, String to) {
-        copyTXTFiles(from, to);
+        File folder2 = new File(to);
+        if(!folder2.getParentFile().exists()){
+            folder2.getParentFile().mkdir();
+        }
 
-        return;
+        File folder1 = new File(from);
+        if((folder1.getName().endsWith(".txt"))){
+            try {
+                Files.copy(folder1.toPath(), folder2.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+//        File[] listOfFiles = folder.listFiles();
+//        if (listOfFiles == null) {
+//            for (File file : listOfFiles) {
+//                if (file.getName().endsWith(".txt")) {
+//                    try {
+//                        Files.copy(file.toPath(), Paths.get(to + "/" + file.getName()));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+
     }
 
 
@@ -60,23 +100,19 @@ public class SimpleFileRepository implements FileRepository {
     @Override
     public boolean createFile(String path, String name) {
 
-        Path path1 = Paths.get(path + "/" + name);
-        Path path2 = Paths.get(path);
-        try {
-            if (!Files.exists(path2)) {
-                Files.createDirectory(path2);
-            }
-        } catch (IOException e) {
-            return false;
+        File file = new File(getClass().getResource("/").getPath() + path + "/" + name);
+        File dir = new File(getClass().getResource("/").getPath() + path);
+
+        if (!dir.exists()) {
+            dir.mkdir();
         }
         try {
-            if (!Files.exists(path1)) {
-                Files.createFile(path1);
-            }
+            if (!file.exists())
+                return file.createNewFile();
         } catch (IOException e) {
-            return false;
+            e.printStackTrace();
         }
-        return Files.exists(path1);
+        return false;
     }
 
 
@@ -88,11 +124,13 @@ public class SimpleFileRepository implements FileRepository {
      */
     @Override
     public String readFileFromResources(String fileName) {
+        File file = new File("src/main/resources/" + fileName);
         try {
-            FileReader fileReader = new FileReader(readFileFromResources(fileName));
-            return fileReader.getEncoding();
-        } catch (FileNotFoundException e) {
-            return null;
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            return bufferedReader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 }

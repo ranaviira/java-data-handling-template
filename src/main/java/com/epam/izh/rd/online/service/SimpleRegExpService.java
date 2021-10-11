@@ -9,21 +9,14 @@ public class SimpleRegExpService implements RegExpService {
 
     SimpleFileRepository repository = new SimpleFileRepository();
 
-    /**
-     * Метод должен читать файл sensitive_data.txt (из директории resources) и маскировать в нем конфиденциальную информацию.
-     * Номер счета должен содержать только первые 4 и последние 4 цифры (1234 **** **** 5678). Метод должен содержать регулярное
-     * выражение для поиска счета.
-     *
-     * @return обработанный текст
-     */
     @Override
     public String maskSensitiveData() {
-        String s1 = repository.readFileFromResources("sensitive_data.txt");
-        String s;
+        String readFile = repository.readFileFromResources("sensitive_data.txt");
+        String resultMask;
         Pattern pattern = Pattern.compile("(\\d{4}).(\\d{4}).(\\d{4}).(\\d{4})");
-        Matcher matcher = pattern.matcher(s1);
-        s = matcher.replaceAll("$1 **** **** $4");
-        return s;
+        Matcher matcher = pattern.matcher(readFile);
+        resultMask = matcher.replaceAll("$1 **** **** $4");
+        return resultMask;
     }
 
     /**
@@ -35,18 +28,16 @@ public class SimpleRegExpService implements RegExpService {
     @Override
     public String replacePlaceholders(double paymentAmount, double balance) {
 
-        String s1 = repository.readFileFromResources("sensitive_data.txt");
-        String s;
+        String readFile = repository.readFileFromResources("sensitive_data.txt");
 
-        Pattern pattern = Pattern.compile("\\$\\{payment_amount}");
-        Matcher matcher = pattern.matcher(s1);
+        Pattern patternPaymentAmount = Pattern.compile("\\$\\{payment_amount}");
+        Matcher matcherPaymentAmount = patternPaymentAmount.matcher(readFile);
 
-        s = matcher.replaceAll(Integer.toString((int) paymentAmount));
+        String replacePaymentAmount = matcherPaymentAmount.replaceAll(Integer.toString((int) paymentAmount));
 
-        Pattern pattern1 = Pattern.compile("\\$\\{balance}");
-        Matcher matcher1 = pattern1.matcher(s);
+        Pattern patternBalance = Pattern.compile("\\$\\{balance}");
+        Matcher matcherBalance = patternBalance.matcher(replacePaymentAmount);
 
-        String s2 = matcher1.replaceAll(Integer.toString((int) balance));
-        return s2;
+        return matcherBalance.replaceAll(Integer.toString((int) balance));
     }
 }

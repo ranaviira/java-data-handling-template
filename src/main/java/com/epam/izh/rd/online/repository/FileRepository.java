@@ -2,7 +2,6 @@ package com.epam.izh.rd.online.repository;
 
 public interface FileRepository {
 
-
     long countFilesInDirectory(String path);
 
     long countDirsInDirectory(String path);

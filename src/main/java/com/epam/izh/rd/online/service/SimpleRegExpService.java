@@ -1,17 +1,22 @@
 package com.epam.izh.rd.online.service;
 
+import com.epam.izh.rd.online.repository.SimpleFileRepository;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SimpleRegExpService implements RegExpService {
 
-    /**
-     * Метод должен читать файл sensitive_data.txt (из директории resources) и маскировать в нем конфиденциальную информацию.
-     * Номер счета должен содержать только первые 4 и последние 4 цифры (1234 **** **** 5678). Метод должен содержать регулярное
-     * выражение для поиска счета.
-     *
-     * @return обработанный текст
-     */
+    SimpleFileRepository repository = new SimpleFileRepository();
+
     @Override
     public String maskSensitiveData() {
-        return null;
+        String readFile = repository.readFileFromResources("sensitive_data.txt");
+        String resultMask;
+        Pattern pattern = Pattern.compile("(\\d{4}).(\\d{4}).(\\d{4}).(\\d{4})");
+        Matcher matcher = pattern.matcher(readFile);
+        resultMask = matcher.replaceAll("$1 **** **** $4");
+        return resultMask;
     }
 
     /**
@@ -22,6 +27,17 @@ public class SimpleRegExpService implements RegExpService {
      */
     @Override
     public String replacePlaceholders(double paymentAmount, double balance) {
-        return null;
+
+        String readFile = repository.readFileFromResources("sensitive_data.txt");
+
+        Pattern patternPaymentAmount = Pattern.compile("\\$\\{payment_amount}");
+        Matcher matcherPaymentAmount = patternPaymentAmount.matcher(readFile);
+
+        String replacePaymentAmount = matcherPaymentAmount.replaceAll(Integer.toString((int) paymentAmount));
+
+        Pattern patternBalance = Pattern.compile("\\$\\{balance}");
+        Matcher matcherBalance = patternBalance.matcher(replacePaymentAmount);
+
+        return matcherBalance.replaceAll(Integer.toString((int) balance));
     }
 }
